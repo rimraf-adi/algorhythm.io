@@ -1,0 +1,518 @@
+import {
+  AlgorithmVisualization,
+  CurriculumCluster,
+  Curriculum,
+} from './types';
+
+// BFS Algorithm Visualization
+export const bfsAlgorithm: AlgorithmVisualization = {
+  id: 'bfs',
+  name: 'Breadth-First Search (BFS)',
+  description: 'Explores graph level by level, visiting all neighbors before moving deeper.',
+  complexity: {
+    time: 'O(V + E)',
+    space: 'O(V)',
+  },
+  initialNodes: [
+    { id: 'A', label: 'A', x: 150, y: 100 },
+    { id: 'B', label: 'B', x: 300, y: 50 },
+    { id: 'C', label: 'C', x: 300, y: 150 },
+    { id: 'D', label: 'D', x: 450, y: 100 },
+    { id: 'E', label: 'E', x: 450, y: 200 },
+  ],
+  initialEdges: [
+    { id: 'AB', source: 'A', target: 'B' },
+    { id: 'AC', source: 'A', target: 'C' },
+    { id: 'BD', source: 'B', target: 'D' },
+    { id: 'CD', source: 'C', target: 'D' },
+    { id: 'DE', source: 'D', target: 'E' },
+  ],
+  pseudocode: [
+    'function BFS(graph, start):',
+    '  queue ← Queue()',
+    '  visited ← Set()',
+    '  queue.enqueue(start)',
+    '  visited.add(start)',
+    '  while queue is not empty:',
+    '    node ← queue.dequeue()',
+    '    process(node)',
+    '    for each neighbor of node:',
+    '      if neighbor not in visited:',
+    '        visited.add(neighbor)',
+    '        queue.enqueue(neighbor)',
+  ],
+  steps: [
+    {
+      stepNumber: 0,
+      description: 'Initialize: Start at node A, add to queue and mark visited',
+      nodes: [
+        { id: 'A', state: 'visiting', label: 'A' },
+        { id: 'B', state: 'normal', label: 'B' },
+        { id: 'C', state: 'normal', label: 'C' },
+        { id: 'D', state: 'normal', label: 'D' },
+        { id: 'E', state: 'normal', label: 'E' },
+      ],
+      edges: [],
+      pseudocode: [{ line: 4, code: 'queue.enqueue(start)' }],
+    },
+    {
+      stepNumber: 1,
+      description: 'Dequeue A, add neighbors B and C to queue',
+      nodes: [
+        { id: 'A', state: 'visited', label: 'A' },
+        { id: 'B', state: 'visiting', label: 'B' },
+        { id: 'C', state: 'visiting', label: 'C' },
+        { id: 'D', state: 'normal', label: 'D' },
+        { id: 'E', state: 'normal', label: 'E' },
+      ],
+      edges: [
+        { id: 'AB', state: 'visited' },
+        { id: 'AC', state: 'visited' },
+      ],
+      pseudocode: [{ line: 7, code: 'node ← queue.dequeue()' }],
+    },
+    {
+      stepNumber: 2,
+      description: 'Dequeue B, add neighbor D to queue',
+      nodes: [
+        { id: 'A', state: 'visited', label: 'A' },
+        { id: 'B', state: 'visited', label: 'B' },
+        { id: 'C', state: 'visiting', label: 'C' },
+        { id: 'D', state: 'visiting', label: 'D' },
+        { id: 'E', state: 'normal', label: 'E' },
+      ],
+      edges: [
+        { id: 'AB', state: 'visited' },
+        { id: 'AC', state: 'visited' },
+        { id: 'BD', state: 'visited' },
+      ],
+      pseudocode: [{ line: 7, code: 'node ← queue.dequeue()' }],
+    },
+    {
+      stepNumber: 3,
+      description: 'Dequeue C, D already queued, no new neighbors',
+      nodes: [
+        { id: 'A', state: 'visited', label: 'A' },
+        { id: 'B', state: 'visited', label: 'B' },
+        { id: 'C', state: 'visited', label: 'C' },
+        { id: 'D', state: 'visiting', label: 'D' },
+        { id: 'E', state: 'normal', label: 'E' },
+      ],
+      edges: [
+        { id: 'AB', state: 'visited' },
+        { id: 'AC', state: 'visited' },
+        { id: 'BD', state: 'visited' },
+        { id: 'CD', state: 'visited' },
+      ],
+      pseudocode: [{ line: 7, code: 'node ← queue.dequeue()' }],
+    },
+    {
+      stepNumber: 4,
+      description: 'Dequeue D, add neighbor E to queue',
+      nodes: [
+        { id: 'A', state: 'visited', label: 'A' },
+        { id: 'B', state: 'visited', label: 'B' },
+        { id: 'C', state: 'visited', label: 'C' },
+        { id: 'D', state: 'visited', label: 'D' },
+        { id: 'E', state: 'visiting', label: 'E' },
+      ],
+      edges: [
+        { id: 'AB', state: 'visited' },
+        { id: 'AC', state: 'visited' },
+        { id: 'BD', state: 'visited' },
+        { id: 'CD', state: 'visited' },
+        { id: 'DE', state: 'visited' },
+      ],
+      pseudocode: [{ line: 7, code: 'node ← queue.dequeue()' }],
+    },
+    {
+      stepNumber: 5,
+      description: 'Dequeue E, no unvisited neighbors. Queue empty, done!',
+      nodes: [
+        { id: 'A', state: 'visited', label: 'A' },
+        { id: 'B', state: 'visited', label: 'B' },
+        { id: 'C', state: 'visited', label: 'C' },
+        { id: 'D', state: 'visited', label: 'D' },
+        { id: 'E', state: 'visited', label: 'E' },
+      ],
+      edges: [
+        { id: 'AB', state: 'visited' },
+        { id: 'AC', state: 'visited' },
+        { id: 'BD', state: 'visited' },
+        { id: 'CD', state: 'visited' },
+        { id: 'DE', state: 'visited' },
+      ],
+      pseudocode: [{ line: 6, code: 'while queue is not empty:' }],
+    },
+  ],
+};
+
+// DFS Algorithm Visualization
+export const dfsAlgorithm: AlgorithmVisualization = {
+  id: 'dfs',
+  name: 'Depth-First Search (DFS)',
+  description: 'Explores graph by going as deep as possible before backtracking.',
+  complexity: {
+    time: 'O(V + E)',
+    space: 'O(V)',
+  },
+  initialNodes: [
+    { id: 'A', label: 'A', x: 150, y: 100 },
+    { id: 'B', label: 'B', x: 300, y: 50 },
+    { id: 'C', label: 'C', x: 300, y: 150 },
+    { id: 'D', label: 'D', x: 450, y: 100 },
+    { id: 'E', label: 'E', x: 450, y: 200 },
+  ],
+  initialEdges: [
+    { id: 'AB', source: 'A', target: 'B' },
+    { id: 'AC', source: 'A', target: 'C' },
+    { id: 'BD', source: 'B', target: 'D' },
+    { id: 'CD', source: 'C', target: 'D' },
+    { id: 'DE', source: 'D', target: 'E' },
+  ],
+  pseudocode: [
+    'function DFS(graph, node, visited):',
+    '  visited.add(node)',
+    '  process(node)',
+    '  for each neighbor of node:',
+    '    if neighbor not in visited:',
+    '      DFS(graph, neighbor, visited)',
+    '',
+    'visited ← Set()',
+    'DFS(graph, start, visited)',
+  ],
+  steps: [
+    {
+      stepNumber: 0,
+      description: 'Start at node A, mark visited, explore neighbors',
+      nodes: [
+        { id: 'A', state: 'visiting', label: 'A' },
+        { id: 'B', state: 'normal', label: 'B' },
+        { id: 'C', state: 'normal', label: 'C' },
+        { id: 'D', state: 'normal', label: 'D' },
+        { id: 'E', state: 'normal', label: 'E' },
+      ],
+      edges: [],
+      pseudocode: [{ line: 2, code: 'visited.add(node)' }],
+    },
+    {
+      stepNumber: 1,
+      description: 'Visit first neighbor B, go deep',
+      nodes: [
+        { id: 'A', state: 'visited', label: 'A' },
+        { id: 'B', state: 'visiting', label: 'B' },
+        { id: 'C', state: 'normal', label: 'C' },
+        { id: 'D', state: 'normal', label: 'D' },
+        { id: 'E', state: 'normal', label: 'E' },
+      ],
+      edges: [{ id: 'AB', state: 'visited' }],
+      pseudocode: [{ line: 6, code: 'DFS(graph, neighbor, visited)' }],
+    },
+    {
+      stepNumber: 2,
+      description: 'Visit neighbor of B which is D',
+      nodes: [
+        { id: 'A', state: 'visited', label: 'A' },
+        { id: 'B', state: 'visited', label: 'B' },
+        { id: 'C', state: 'normal', label: 'C' },
+        { id: 'D', state: 'visiting', label: 'D' },
+        { id: 'E', state: 'normal', label: 'E' },
+      ],
+      edges: [
+        { id: 'AB', state: 'visited' },
+        { id: 'BD', state: 'visited' },
+      ],
+      pseudocode: [{ line: 6, code: 'DFS(graph, neighbor, visited)' }],
+    },
+    {
+      stepNumber: 3,
+      description: 'Visit neighbor of D which is E',
+      nodes: [
+        { id: 'A', state: 'visited', label: 'A' },
+        { id: 'B', state: 'visited', label: 'B' },
+        { id: 'C', state: 'normal', label: 'C' },
+        { id: 'D', state: 'visited', label: 'D' },
+        { id: 'E', state: 'visiting', label: 'E' },
+      ],
+      edges: [
+        { id: 'AB', state: 'visited' },
+        { id: 'BD', state: 'visited' },
+        { id: 'DE', state: 'visited' },
+      ],
+      pseudocode: [{ line: 6, code: 'DFS(graph, neighbor, visited)' }],
+    },
+    {
+      stepNumber: 4,
+      description: 'E has no unvisited neighbors, backtrack to D',
+      nodes: [
+        { id: 'A', state: 'visited', label: 'A' },
+        { id: 'B', state: 'visited', label: 'B' },
+        { id: 'C', state: 'normal', label: 'C' },
+        { id: 'D', state: 'visited', label: 'D' },
+        { id: 'E', state: 'visited', label: 'E' },
+      ],
+      edges: [
+        { id: 'AB', state: 'visited' },
+        { id: 'BD', state: 'visited' },
+        { id: 'DE', state: 'visited' },
+      ],
+      pseudocode: [{ line: 4, code: 'for each neighbor of node:' }],
+    },
+    {
+      stepNumber: 5,
+      description: 'Backtrack to B, then A. Visit C from A',
+      nodes: [
+        { id: 'A', state: 'visited', label: 'A' },
+        { id: 'B', state: 'visited', label: 'B' },
+        { id: 'C', state: 'visiting', label: 'C' },
+        { id: 'D', state: 'visited', label: 'D' },
+        { id: 'E', state: 'visited', label: 'E' },
+      ],
+      edges: [
+        { id: 'AB', state: 'visited' },
+        { id: 'BD', state: 'visited' },
+        { id: 'DE', state: 'visited' },
+        { id: 'AC', state: 'visited' },
+      ],
+      pseudocode: [{ line: 6, code: 'DFS(graph, neighbor, visited)' }],
+    },
+    {
+      stepNumber: 6,
+      description: 'C neighbors already visited, backtrack. Complete!',
+      nodes: [
+        { id: 'A', state: 'visited', label: 'A' },
+        { id: 'B', state: 'visited', label: 'B' },
+        { id: 'C', state: 'visited', label: 'C' },
+        { id: 'D', state: 'visited', label: 'D' },
+        { id: 'E', state: 'visited', label: 'E' },
+      ],
+      edges: [
+        { id: 'AB', state: 'visited' },
+        { id: 'BD', state: 'visited' },
+        { id: 'DE', state: 'visited' },
+        { id: 'AC', state: 'visited' },
+        { id: 'CD', state: 'visited' },
+      ],
+      pseudocode: [{ line: 4, code: 'for each neighbor of node:' }],
+    },
+  ],
+};
+
+// Dijkstra Algorithm Visualization
+export const dijkstraAlgorithm: AlgorithmVisualization = {
+  id: 'dijkstra',
+  name: "Dijkstra's Algorithm",
+  description: 'Finds shortest path from source to all vertices in weighted graph.',
+  complexity: {
+    time: 'O((V + E) log V)',
+    space: 'O(V)',
+  },
+  initialNodes: [
+    { id: 'A', label: 'A', x: 150, y: 100 },
+    { id: 'B', label: 'B', x: 300, y: 50 },
+    { id: 'C', label: 'C', x: 300, y: 150 },
+    { id: 'D', label: 'D', x: 450, y: 100 },
+  ],
+  initialEdges: [
+    { id: 'AB', source: 'A', target: 'B', weight: 4 },
+    { id: 'AC', source: 'A', target: 'C', weight: 2 },
+    { id: 'BC', source: 'B', target: 'C', weight: 1 },
+    { id: 'BD', source: 'B', target: 'D', weight: 5 },
+    { id: 'CD', source: 'C', target: 'D', weight: 8 },
+  ],
+  pseudocode: [
+    'function Dijkstra(graph, source):',
+    '  dist[source] ← 0',
+    '  for each vertex v:',
+    '    if v ≠ source:',
+    '      dist[v] ← ∞',
+    '  pq ← PriorityQueue()',
+    '  pq.push(source, 0)',
+    '  while pq is not empty:',
+    '    u ← pq.pop()',
+    '    for each neighbor v of u:',
+    '      if dist[u] + weight(u,v) < dist[v]:',
+    '        dist[v] ← dist[u] + weight(u,v)',
+    '        pq.push(v, dist[v])',
+  ],
+  steps: [
+    {
+      stepNumber: 0,
+      description: 'Initialize: Set A distance to 0, all others to infinity',
+      nodes: [
+        { id: 'A', state: 'visiting', label: 'A(0)' },
+        { id: 'B', state: 'normal', label: 'B(∞)' },
+        { id: 'C', state: 'normal', label: 'C(∞)' },
+        { id: 'D', state: 'normal', label: 'D(∞)' },
+      ],
+      edges: [],
+      pseudocode: [{ line: 2, code: 'dist[source] ← 0' }],
+    },
+    {
+      stepNumber: 1,
+      description: 'Process A: Update distances to B(4) and C(2)',
+      nodes: [
+        { id: 'A', state: 'visited', label: 'A(0)' },
+        { id: 'B', state: 'normal', label: 'B(4)' },
+        { id: 'C', state: 'visiting', label: 'C(2)' },
+        { id: 'D', state: 'normal', label: 'D(∞)' },
+      ],
+      edges: [
+        { id: 'AB', state: 'visited', label: '4' },
+        { id: 'AC', state: 'visited', label: '2' },
+      ],
+      pseudocode: [
+        { line: 11, code: 'if dist[u] + weight(u,v) < dist[v]:' },
+      ],
+    },
+    {
+      stepNumber: 2,
+      description: 'Process C (minimum): Check neighbors B and D',
+      nodes: [
+        { id: 'A', state: 'visited', label: 'A(0)' },
+        { id: 'B', state: 'visiting', label: 'B(3)' },
+        { id: 'C', state: 'visited', label: 'C(2)' },
+        { id: 'D', state: 'normal', label: 'D(10)' },
+      ],
+      edges: [
+        { id: 'AB', state: 'visited', label: '4' },
+        { id: 'AC', state: 'visited', label: '2' },
+        { id: 'BC', state: 'visited', label: '1' },
+        { id: 'CD', state: 'visited', label: '8' },
+      ],
+      pseudocode: [
+        { line: 11, code: 'if dist[u] + weight(u,v) < dist[v]:' },
+      ],
+    },
+    {
+      stepNumber: 3,
+      description: 'Process B: Update D to 8 (4+5 via B vs 2+8 via C)',
+      nodes: [
+        { id: 'A', state: 'visited', label: 'A(0)' },
+        { id: 'B', state: 'visited', label: 'B(3)' },
+        { id: 'C', state: 'visited', label: 'C(2)' },
+        { id: 'D', state: 'visiting', label: 'D(8)' },
+      ],
+      edges: [
+        { id: 'AB', state: 'visited', label: '4' },
+        { id: 'AC', state: 'visited', label: '2' },
+        { id: 'BC', state: 'visited', label: '1' },
+        { id: 'BD', state: 'visited', label: '5' },
+        { id: 'CD', state: 'visited', label: '8' },
+      ],
+      pseudocode: [
+        { line: 11, code: 'if dist[u] + weight(u,v) < dist[v]:' },
+      ],
+    },
+    {
+      stepNumber: 4,
+      description: 'Process D: Shortest paths computed!',
+      nodes: [
+        { id: 'A', state: 'visited', label: 'A(0)' },
+        { id: 'B', state: 'visited', label: 'B(3)' },
+        { id: 'C', state: 'visited', label: 'C(2)' },
+        { id: 'D', state: 'visited', label: 'D(8)' },
+      ],
+      edges: [
+        { id: 'AB', state: 'visited', label: '4' },
+        { id: 'AC', state: 'visited', label: '2' },
+        { id: 'BC', state: 'visited', label: '1' },
+        { id: 'BD', state: 'visited', label: '5' },
+        { id: 'CD', state: 'visited', label: '8' },
+      ],
+      pseudocode: [{ line: 8, code: 'while pq is not empty:' }],
+    },
+  ],
+};
+
+// Curriculum data with all clusters and algorithms
+export const curriculum: Curriculum = {
+  clusters: [
+    {
+      id: 'graph-basics',
+      name: 'Graph Basics',
+      description: 'Fundamentals of graph theory and representations',
+      color: '#000000',
+      algorithms: [
+        {
+          id: 'graph-intro',
+          name: 'Graph Introduction',
+          description: 'Learn what graphs are and how to represent them',
+          complexity: { time: 'N/A', space: 'N/A' },
+          initialNodes: [
+            { id: '0', label: '0', x: 100, y: 100 },
+            { id: '1', label: '1', x: 250, y: 50 },
+            { id: '2', label: '2', x: 250, y: 150 },
+            { id: '3', label: '3', x: 400, y: 100 },
+          ],
+          initialEdges: [
+            { id: 'e1', source: '0', target: '1' },
+            { id: 'e2', source: '0', target: '2' },
+            { id: 'e3', source: '1', target: '3' },
+            { id: 'e4', source: '2', target: '3' },
+          ],
+          pseudocode: [
+            'Graph = (V, E)',
+            'V = {0, 1, 2, 3}',
+            'E = {(0,1), (0,2),',
+            '     (1,3), (2,3)}',
+          ],
+          steps: [
+            {
+              stepNumber: 0,
+              description: 'A graph consists of vertices and edges',
+              nodes: [
+                { id: '0', state: 'normal' },
+                { id: '1', state: 'normal' },
+                { id: '2', state: 'normal' },
+                { id: '3', state: 'normal' },
+              ],
+              edges: [
+                { id: 'e1', state: 'normal' },
+                { id: 'e2', state: 'normal' },
+                { id: 'e3', state: 'normal' },
+                { id: 'e4', state: 'normal' },
+              ],
+              pseudocode: [],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'search-algorithms',
+      name: 'Search Algorithms',
+      description: 'Traverse graphs and find paths',
+      color: '#000000',
+      algorithms: [bfsAlgorithm, dfsAlgorithm],
+    },
+    {
+      id: 'shortest-path',
+      name: 'Shortest Path',
+      description: 'Find optimal paths in weighted graphs',
+      color: '#000000',
+      algorithms: [dijkstraAlgorithm],
+    },
+    {
+      id: 'mst',
+      name: 'Minimum Spanning Tree',
+      description: 'Connect all vertices with minimum edge weight',
+      color: '#000000',
+      algorithms: [],
+    },
+    {
+      id: 'topological-sort',
+      name: 'Topological Sorting',
+      description: 'Linear ordering of directed acyclic graphs',
+      color: '#000000',
+      algorithms: [],
+    },
+    {
+      id: 'advanced',
+      name: 'Advanced Algorithms',
+      description: 'Flow networks, matching, and more',
+      color: '#000000',
+      algorithms: [],
+    },
+  ],
+};
