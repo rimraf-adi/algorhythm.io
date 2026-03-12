@@ -1,7 +1,6 @@
 import { curriculum } from '@/lib/algorithms';
 import { ClusterSelector } from '@/components/learn/cluster-selector';
-import { VisualizationArea } from '@/components/learn/visualization-area';
-import { InfoPanel } from '@/components/learn/info-panel';
+import { AlgorithmView } from '@/components/learn/algorithm-view';
 import { redirect } from 'next/navigation';
 
 interface AlgorithmPageProps {
@@ -34,16 +33,8 @@ export default async function AlgorithmPage({ params }: AlgorithmPageProps) {
         selectedAlgorithmId={algorithmId}
       />
 
-      {/* Center - Canvas & Controls */}
-      <VisualizationArea 
-        algorithm={algorithm}
-        rightPanel={(currentStep) => (
-          <InfoPanel 
-            algorithm={algorithm} 
-            currentStep={algorithm.steps[currentStep]}
-          />
-        )}
-      />
+      {/* Center - Canvas & Controls + Right Panel */}
+      <AlgorithmView algorithm={algorithm} />
     </div>
   );
 }
