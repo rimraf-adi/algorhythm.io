@@ -1,15 +1,13 @@
 'use client';
 
-import { SkipBack, Play, Pause, SkipForward, RotateCcw } from 'lucide-react';
+import { SkipBack, SkipForward, RotateCcw } from 'lucide-react';
 
 interface StepControlsProps {
   currentStep: number;
   totalSteps: number;
-  isPlaying: boolean;
   speed: number;
   onPrevStep: () => void;
   onNextStep: () => void;
-  onPlayPause: () => void;
   onReset: () => void;
   onSpeedChange: (speed: number) => void;
 }
@@ -17,11 +15,9 @@ interface StepControlsProps {
 export function StepControls({
   currentStep,
   totalSteps,
-  isPlaying,
   speed,
   onPrevStep,
   onNextStep,
-  onPlayPause,
   onReset,
   onSpeedChange,
 }: StepControlsProps) {
@@ -49,7 +45,6 @@ export function StepControls({
 
         <button
           onClick={onPrevStep}
-          disabled={currentStep === 0}
           className="p-2 hover:bg-white transition disabled:opacity-30"
           title="previous step"
         >
@@ -57,16 +52,7 @@ export function StepControls({
         </button>
 
         <button
-          onClick={onPlayPause}
-          className="p-2 hover:bg-white transition"
-          title={isPlaying ? 'pause' : 'play'}
-        >
-          {isPlaying ? <Pause size={16} /> : <Play size={16} />}
-        </button>
-
-        <button
           onClick={onNextStep}
-          disabled={currentStep === totalSteps}
           className="p-2 hover:bg-white transition disabled:opacity-30"
           title="next step"
         >
@@ -85,6 +71,7 @@ export function StepControls({
           <option value={1}>1x</option>
           <option value={1.5}>1.5x</option>
           <option value={2}>2x</option>
+          <option value={3}>3x</option>
         </select>
       </div>
     </div>

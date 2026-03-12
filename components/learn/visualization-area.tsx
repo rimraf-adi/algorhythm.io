@@ -12,7 +12,6 @@ interface VisualizationAreaProps {
 
 export function VisualizationArea({ algorithm, rightPanel }: VisualizationAreaProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
 
   const totalSteps = algorithm.steps.length - 1;
@@ -25,31 +24,29 @@ export function VisualizationArea({ algorithm, rightPanel }: VisualizationAreaPr
     setCurrentStep((prev) => Math.min(totalSteps, prev + 1));
   }, [totalSteps]);
 
-  const handlePlayPause = useCallback(() => {
-    setIsPlaying((prev) => !prev);
-  }, []);
-
   const handleReset = useCallback(() => {
     setCurrentStep(0);
-    setIsPlaying(false);
   }, []);
 
-  // Auto-advance when playing
+  // Endless Auto-loop
   useEffect(() => {
-    if (!isPlaying) return;
-
     const interval = setInterval(() => {
       setCurrentStep((prev) => {
         if (prev >= totalSteps) {
-          setIsPlaying(false);
-          return prev;
+          // Loop back to 0 seamlessly
+          return 0;
         }
         return prev + 1;
       });
     }, 1000 / speed);
 
     return () => clearInterval(interval);
-  }, [isPlaying, speed, totalSteps]);
+  }, [speed, totalSteps]);
+
+  // Reset to step 0 when the algorithm changes
+  useEffect(() => {
+    setCurrentStep(0);
+  }, [algorithm.id]);
 
   const step = algorithm.steps[currentStep];
 
@@ -62,11 +59,9 @@ export function VisualizationArea({ algorithm, rightPanel }: VisualizationAreaPr
         <StepControls
           currentStep={currentStep}
           totalSteps={totalSteps}
-          isPlaying={isPlaying}
           speed={speed}
           onPrevStep={handlePrevStep}
           onNextStep={handleNextStep}
-          onPlayPause={handlePlayPause}
           onReset={handleReset}
           onSpeedChange={setSpeed}
         />

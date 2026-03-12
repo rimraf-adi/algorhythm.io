@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { GraphNode, GraphEdge, GraphStep, AlgorithmVisualization } from '@/lib/types';
+import { GraphEdge, GraphNode, GraphStep, AlgorithmVisualization } from '@/lib/types';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface GraphCanvasProps {
   algorithm: AlgorithmVisualization;
@@ -10,136 +9,146 @@ interface GraphCanvasProps {
 }
 
 export function GraphCanvas({ algorithm, currentStep }: GraphCanvasProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  // Create state maps for quick lookup of current animation frame
+  const nodeStateMap = new Map(currentStep.nodes.map(n => [n.id, n]));
+  const edgeStateMap = new Map(currentStep.edges.map(e => [e.id, e]));
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-
-    // Fill background
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Draw grid for reference (light) — drawn first so nodes/edges render on top
-    ctx.strokeStyle = '#f0f0f0';
-    ctx.lineWidth = 0.5;
-    for (let x = 0; x < canvas.width; x += 50) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, canvas.height);
-      ctx.stroke();
-    }
-    for (let y = 0; y < canvas.height; y += 50) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(canvas.width, y);
-      ctx.stroke();
-    }
-
-    // Create a map of node states for quick lookup
-    const nodeStateMap = new Map(
-      currentStep.nodes.map(n => [n.id, n])
-    );
-    const edgeStateMap = new Map(
-      currentStep.edges.map(e => [e.id, e])
-    );
-
-    // Draw edges
-    ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 2;
-    algorithm.initialEdges.forEach((edge) => {
-      const edgeState = edgeStateMap.get(edge.id);
-      const sourceNode = algorithm.initialNodes.find(n => n.id === edge.source);
-      const targetNode = algorithm.initialNodes.find(n => n.id === edge.target);
-
-      if (!sourceNode || !targetNode) return;
-
-      // Color based on state
-      if (edgeState?.state === 'visited') {
-        ctx.strokeStyle = '#999999';
-      } else if (edgeState?.state === 'visiting') {
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 3;
-      } else {
-        ctx.strokeStyle = '#cccccc';
-        ctx.lineWidth = 2;
-      }
-
-      // Draw edge
-      ctx.beginPath();
-      ctx.moveTo(sourceNode.x, sourceNode.y);
-      ctx.lineTo(targetNode.x, targetNode.y);
-      ctx.stroke();
-
-      // Reset line width
-      ctx.lineWidth = 2;
-
-      // Draw weight if exists
-      if (edge.weight) {
-        const midX = (sourceNode.x + targetNode.x) / 2;
-        const midY = (sourceNode.y + targetNode.y) / 2;
-        ctx.fillStyle = '#000000';
-        ctx.font = '11px "JetBrains Mono"';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(edge.weight.toString(), midX, midY - 8);
-      }
-    });
-
-    // Draw nodes
-    algorithm.initialNodes.forEach((node) => {
-      const nodeState = nodeStateMap.get(node.id);
-
-      // Determine colors based on state
-      let fillColor = '#ffffff';
-      let strokeColor = '#000000';
-      let strokeWidth = 2;
-
-      if (nodeState?.state === 'visited') {
-        fillColor = '#cccccc';
-        strokeColor = '#666666';
-      } else if (nodeState?.state === 'visiting') {
-        fillColor = '#000000';
-        strokeColor = '#000000';
-        strokeWidth = 3;
-      } else if (nodeState?.state === 'highlighted') {
-        fillColor = '#f0f0f0';
-        strokeColor = '#000000';
-        strokeWidth = 3;
-      }
-
-      // Draw node circle
-      ctx.fillStyle = fillColor;
-      ctx.strokeStyle = strokeColor;
-      ctx.lineWidth = strokeWidth;
-      ctx.beginPath();
-      ctx.arc(node.x, node.y, 12, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-
-      // Draw node label
-      ctx.fillStyle = nodeState?.state === 'visiting' ? '#ffffff' : '#000000';
-      ctx.font = 'bold 12px "JetBrains Mono"';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      const label = nodeState?.label || node.label;
-      ctx.fillText(label, node.x, node.y);
-    });
-  }, [currentStep, algorithm]);
+  // Base canvas dimensions relative to internal SVG viewBox
+  const viewBoxWidth = 800;
+  const viewBoxHeight = 600;
 
   return (
-    <motion.canvas
-      ref={canvasRef}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="w-full h-full bg-white border-b border-black border-opacity-20"
-    />
+    <div className="w-full h-full bg-white border-b border-black border-opacity-20 overflow-hidden relative">
+      {/* Background Grid - CSS Pattern for continuous crispness */}
+      <div 
+        className="absolute inset-0 pointer-events-none opacity-20"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, #000 1px, transparent 1px),
+            linear-gradient(to bottom, #000 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px'
+        }}
+      />
+      
+      <svg
+        className="w-full h-full relative z-10"
+        viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
+        preserveAspectRatio="xMidYMid meet"
+      >
+        <AnimatePresence>
+          {/* Edges Layer */}
+          <g>
+            {algorithm.initialEdges.map((edge) => {
+              const edgeState = edgeStateMap.get(edge.id);
+              const sourceNode = algorithm.initialNodes.find(n => n.id === edge.source);
+              const targetNode = algorithm.initialNodes.find(n => n.id === edge.target);
+
+              if (!sourceNode || !targetNode) return null;
+
+              // Color mapping
+              let strokeColor = '#cccccc';
+              let strokeWidth = 2;
+
+              if (edgeState?.state === 'visited') {
+                strokeColor = '#999999';
+              } else if (edgeState?.state === 'visiting') {
+                strokeColor = '#000000';
+                strokeWidth = 3;
+              }
+
+              const midX = (sourceNode.x + targetNode.x) / 2;
+              const midY = (sourceNode.y + targetNode.y) / 2;
+
+              return (
+                <g key={edge.id}>
+                  <motion.line
+                    x1={sourceNode.x}
+                    y1={sourceNode.y}
+                    x2={targetNode.x}
+                    y2={targetNode.y}
+                    animate={{
+                      stroke: strokeColor,
+                      strokeWidth: strokeWidth,
+                    }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    strokeLinecap="round"
+                  />
+                  {edge.weight !== undefined && (
+                    <text
+                      x={midX}
+                      y={midY - 8}
+                      fill="#000000"
+                      fontSize="11px"
+                      fontFamily="JetBrains Mono"
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                    >
+                      {edge.weight}
+                    </text>
+                  )}
+                </g>
+              );
+            })}
+          </g>
+
+          {/* Nodes Layer */}
+          <g>
+            {algorithm.initialNodes.map((node) => {
+              const nodeState = nodeStateMap.get(node.id);
+
+              let fillColor = '#ffffff';
+              let strokeColor = '#000000';
+              let strokeWidth = 2;
+
+              if (nodeState?.state === 'visited') {
+                fillColor = '#cccccc';
+                strokeColor = '#666666';
+              } else if (nodeState?.state === 'visiting') {
+                fillColor = '#000000';
+                strokeColor = '#000000';
+                strokeWidth = 3;
+              } else if (nodeState?.state === 'highlighted') {
+                fillColor = '#f0f0f0';
+                strokeColor = '#000000';
+                strokeWidth = 3;
+              }
+
+              const labelColor = nodeState?.state === 'visiting' ? '#ffffff' : '#000000';
+              const label = nodeState?.label || node.label;
+
+              return (
+                <g key={node.id}>
+                  <motion.circle
+                    cx={node.x}
+                    cy={node.y}
+                    r={12}
+                    animate={{
+                      fill: fillColor,
+                      stroke: strokeColor,
+                      strokeWidth: strokeWidth,
+                    }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                  />
+                  <motion.text
+                    x={node.x}
+                    y={node.y}
+                    animate={{ fill: labelColor }}
+                    transition={{ duration: 0.3 }}
+                    fontSize="12px"
+                    fontWeight="bold"
+                    fontFamily="JetBrains Mono"
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                  >
+                    {label}
+                  </motion.text>
+                </g>
+              );
+            })}
+          </g>
+        </AnimatePresence>
+      </svg>
+    </div>
   );
 }
